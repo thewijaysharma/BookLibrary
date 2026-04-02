@@ -2,6 +2,8 @@ package com.library.book_library.controller;
 
 import com.library.book_library.model.Book;
 import com.library.book_library.service.BookService;
+import jakarta.annotation.Nullable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,20 @@ public class BookController {
     public BookController(BookService service){
         this.bookService = service;
     }
+
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks(){
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<List<Book>> getAllBooks(@RequestParam(required = false, name = "author") @Nullable String authorName,
+                                                  @RequestParam(required = false, name = "title") @Nullable String titleName) {
+        if(authorName == null && titleName == null){
+            return ResponseEntity.ok(bookService.getAllBooks());
+        }else{
+            List<Book> books = bookService.filterBooks(authorName, titleName);
+            if(books.size() > 0){
+                return ResponseEntity.ok(books);
+            }else{
+                return ResponseEntity.noContent().build();
+            }
+        }
     }
 
     @GetMapping("/{id}")   // GET /books/1
@@ -27,12 +40,13 @@ public class BookController {
         if (book != null) {
             return ResponseEntity.ok(book);
         }
-        return ResponseEntity.notFound().build();    }
+        return ResponseEntity.notFound().build();
+    }
 
     @PostMapping
     public ResponseEntity<Void> addBook(@RequestBody Book book) {
         bookService.addNewBook(book);
-        return ResponseEntity.status(201).build(); // todo send success response body later
+        return ResponseEntity.status(HttpStatus.CREATED).build(); // todo send success response body later
     }
 
     @PutMapping("/{id}")   // PUT /books/1

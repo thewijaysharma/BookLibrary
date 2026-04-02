@@ -28,6 +28,15 @@ public class BookService {
                 .orElse(null);
     }
 
+    public List<Book> filterBooks(@Nullable String authorName, @Nullable String bookTitle) {
+        String authorSearch = authorName != null ? authorName.toLowerCase() : null;
+        String titleSearch = bookTitle != null ? bookTitle.toLowerCase() : null;
+
+        return books.stream()
+                .filter(book -> authorSearch == null || book.getAuthor().toLowerCase().contains(authorSearch))
+                .filter(book -> titleSearch == null || book.getTitle().toLowerCase().contains(titleSearch)).toList();
+    }
+
     public void addNewBook(Book book) {
         books.add(book);
     }
