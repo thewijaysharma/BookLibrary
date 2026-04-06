@@ -18,10 +18,6 @@ public class BookService {
             new Book(3L, "Designing Data-Intensive Applications", "Martin Kleppmann")
     ));
 
-    public List<Book> getAllBooks() {
-        return books;
-    }
-
     @Nonnull
     public Book getBookById(Long id) {
         return books.stream()
@@ -39,11 +35,13 @@ public class BookService {
                 .filter(book -> titleSearch == null || book.getTitle().toLowerCase().contains(titleSearch)).toList();
     }
 
-    public void addNewBook(Book book) {
-        books.add(book);
+    public Book addNewBook(Book book) {
+        var newId = books.stream().mapToLong(Book::getId).max().orElse(1); // first book id is 1
+        Book newBook = new Book(newId, book.getTitle(), book.getAuthor());
+        books.add(newBook);
+        return newBook;
     }
 
-    @Nullable
     public Book updateBook(Long id, Book newBookData) {
         Book targetBook = getBookById(id);
         targetBook.setTitle(newBookData.getTitle());
@@ -51,10 +49,8 @@ public class BookService {
         return targetBook;
     }
 
-    public boolean deleteBook(Long id){
+    public void deleteBook(Long id){
         Book targetBook = getBookById(id);
         books.remove(targetBook);
-        return true;
-
     }
 }
