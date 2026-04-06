@@ -1,6 +1,8 @@
 package com.library.book_library.service;
 
+import com.library.book_library.exception.BookNotFoundException;
 import com.library.book_library.model.Book;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +22,12 @@ public class BookService {
         return books;
     }
 
-    @Nullable
+    @Nonnull
     public Book getBookById(Long id) {
         return books.stream()
                 .filter(book -> book.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new BookNotFoundException(id));
     }
 
     public List<Book> filterBooks(@Nullable String authorName, @Nullable String bookTitle) {
@@ -44,23 +46,15 @@ public class BookService {
     @Nullable
     public Book updateBook(Long id, Book newBookData) {
         Book targetBook = getBookById(id);
-        if (targetBook != null) {
-            targetBook.setTitle(newBookData.getTitle());
-            targetBook.setAuthor(newBookData.getAuthor());
-            return targetBook;
-        } else {
-            return null; // book not found, couldn't update
-        }
+        targetBook.setTitle(newBookData.getTitle());
+        targetBook.setAuthor(newBookData.getAuthor());
+        return targetBook;
     }
 
     public boolean deleteBook(Long id){
         Book targetBook = getBookById(id);
-        if(targetBook != null){
-            books.remove(targetBook);
-            return true;
-        }else{
-            return false;
-        }
+        books.remove(targetBook);
+        return true;
 
     }
 }

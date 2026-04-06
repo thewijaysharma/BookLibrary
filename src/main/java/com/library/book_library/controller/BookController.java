@@ -3,6 +3,7 @@ package com.library.book_library.controller;
 import com.library.book_library.model.Book;
 import com.library.book_library.service.BookService;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,13 +45,13 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addBook(@RequestBody Book book) {
+    public ResponseEntity<Void> addBook(@Valid @RequestBody Book book) {
         bookService.addNewBook(book);
         return ResponseEntity.status(HttpStatus.CREATED).build(); // todo send success response body later
     }
 
     @PutMapping("/{id}")   // PUT /books/1
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book book) {
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
         Book updatedBook = bookService.updateBook(id, book);
         if (updatedBook != null) {
             return ResponseEntity.ok(updatedBook); // 200 + updated book
