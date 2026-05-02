@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public class BookService {
 
-
     private final BookRepository repository;
 
     public BookService(BookRepository repository) {
@@ -45,7 +44,7 @@ public class BookService {
         return repository.save(targetBook);
     }
 
-    public void deleteBook(Long id){
+    public void deleteBook(Long id) {
         Book targetBook = getBookById(id);
         repository.delete(targetBook);
     }
