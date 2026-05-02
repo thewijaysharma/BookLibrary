@@ -1,12 +1,18 @@
 package com.library.book_library.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+@Entity
 public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final Long id;
     @NotBlank(message = "Title cannot be blank")
+    @Column(nullable = false)
     private String title;
     @NotBlank(message = "Author cannot be blank")
+    @Column(nullable = false)
     private String author;
 
     public Book(Long id, String title, String author) {
