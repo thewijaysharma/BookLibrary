@@ -1,5 +1,6 @@
 package com.library.book_library.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -7,26 +8,29 @@ import jakarta.validation.constraints.NotBlank;
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
     @NotBlank(message = "Title cannot be blank")
     @Column(nullable = false)
     private String title;
-    @NotBlank(message = "Author cannot be blank")
-    @Column(nullable = false)
-    private String author;
 
-    public Book(Long id, String title, String author) {
-        this.id = id;
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    @JsonBackReference
+    private Author author;
+
+    public Book(String title, Author author) {
         this.title = title;
         this.author = author;
     }
 
+    public Book() {}
+
     // Getters
     public Long getId() { return id; }
     public String getTitle() { return title; }
-    public String getAuthor() { return author; }
+    public Author getAuthor() { return author; }
     public void setTitle(String title) {
         this.title  = title;
     }
-    public void setAuthor(String author) { this.author = author; }
+    public void setAuthor(Author author) { this.author = author; }
 }

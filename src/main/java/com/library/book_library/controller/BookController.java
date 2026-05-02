@@ -1,6 +1,7 @@
 package com.library.book_library.controller;
 
 import com.library.book_library.model.Book;
+import com.library.book_library.model.request.BookRequest;
 import com.library.book_library.service.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -31,16 +32,9 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    @PostMapping
-    public ResponseEntity<Book> addBook(@Valid @RequestBody Book book, UriComponentsBuilder uriBuilder) {
-        Book savedBook = bookService.addNewBook(book);
-        URI location = uriBuilder.path("/books/{id}").buildAndExpand(savedBook.getId()).toUri();
-        return ResponseEntity.created(location).body(savedBook);
-    }
-
     @PutMapping("/{id}")   // PUT /books/1
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
-        Book updatedBook = bookService.updateBook(id, book);
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @Valid @RequestBody BookRequest bookRequest) {
+        Book updatedBook = bookService.updateBook(id, bookRequest);
         return ResponseEntity.ok(updatedBook); // 200 + updated book
     }
 
@@ -48,7 +42,16 @@ public class BookController {
     public ResponseEntity<Void> removeBook(@PathVariable Long id){
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
+    }
 
+    @PostMapping
+    public ResponseEntity<Book> addBook(
+            @Valid @RequestBody BookRequest request,
+            UriComponentsBuilder uriBuilder) {
+        Book saved = bookService.addNewBook(request);
+        URI location = uriBuilder.path("/books/{id}")
+                .buildAndExpand(saved.getId()).toUri();
+        return ResponseEntity.created(location).body(saved);
     }
 
 
