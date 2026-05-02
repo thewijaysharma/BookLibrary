@@ -9,9 +9,11 @@ import com.library.book_library.repository.AuthorRepository;
 import com.library.book_library.repository.BookRepository;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class BookService {
@@ -30,13 +32,21 @@ public class BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
-    public List<Book> filterBooks(@Nullable String authorName, @Nullable String bookTitle) {
-        String authorSearch = authorName != null ? authorName.toLowerCase() : null;
-        String titleSearch = bookTitle != null ? bookTitle.toLowerCase() : null;
+    public Page<Book> filterBooks(@Nullable String authorName, @Nullable String bookTitle, int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
-        return bookRepository.findAll().stream()
-                .filter(book -> authorSearch == null || book.getAuthor().getName().toLowerCase().contains(authorSearch))
-                .filter(book -> titleSearch == null || book.getTitle().toLowerCase().contains(titleSearch)).toList();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (authorName != null && bookTitle != null) {
+            return bookRepository.findByTitleAndAuthorName(bookTitle, authorName, pageable);
+        } else if (authorName != null) {
+            return bookRepository.findByAuthorName(authorName, pageable);
+        } else if (bookTitle != null) {
+            return bookRepository.findByTitle(bookTitle, pageable);
+        }
+        return bookRepository.findAll(pageable);
     }
 
     public Book addNewBook(BookRequest bookRequest) {

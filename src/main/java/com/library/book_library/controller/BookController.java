@@ -4,12 +4,11 @@ import com.library.book_library.model.Book;
 import com.library.book_library.model.request.BookRequest;
 import com.library.book_library.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/books")
@@ -22,8 +21,13 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks(@RequestParam(required = false, name = "author") String authorName, @RequestParam(required = false, name = "title") String titleName) {
-        return ResponseEntity.ok(bookService.filterBooks(authorName, titleName));
+    public ResponseEntity<Page<Book>> getAllBooks(@RequestParam(required = false, name = "author") String authorName,
+                                                  @RequestParam(required = false, name = "title") String titleName,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(defaultValue = "id") String sortBy,
+                                                  @RequestParam(defaultValue = "asc") String direction) {
+        return ResponseEntity.ok(bookService.filterBooks(authorName, titleName, page, size, sortBy, direction));
     }
 
     @GetMapping("/{id}")   // GET /books/1
